@@ -1,12 +1,8 @@
 # Rakentaa Heating Curve Card
 
-[![Validate](https://github.com/cpiekacz/rakentaa-heating-curve-card/actions/workflows/validate.yml/badge.svg)](https://github.com/cpiekacz/rakentaa-heating-curve-card/actions/workflows/validate.yml)
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
 An interactive Home Assistant Lovelace custom card for monitoring, simulating, and tuning the weather-compensated heating curve of **Rakentaa** air-to-water heat pumps (Chico **CC1010B** controller, e.g. `RA040-PW13-A3`).
 
-Zero dependencies, pure ES6 Web Component with Shadow DOM, native Home Assistant theme & dark mode support, visual configuration editor (`getConfigForm`), and built-in **English** and **Polish** localization.
+![Rakentaa Heating Curve Card — Main View](docs/images/main-view.png)
 
 ---
 
@@ -24,8 +20,7 @@ Zero dependencies, pure ES6 Web Component with Shadow DOM, native Home Assistant
   - Review an exact before/after diff and impact summary in a confirmation modal before writing changes via `hass.callService`.
   - Only modified parameters are sent to the controller.
 - **Automated Insights**: Real-time diagnostics for unsaved changes, compressor cut-off outdoor temperature, buffer safety limit exceedance, and `−15 °C` design-point values.
-- **Localization**: Defaults to **English (`en`)** with full **Polish (`pl`)** translation, automatically following your Home Assistant user language (`hass.language`) with locale-appropriate decimal formatting.
-- **Visual Editor & Responsive Layout**: Supports Home Assistant's built-in visual card editor (`getConfigForm()`), full-screen `type: panel` views, and standard Sections/Masonry views (`getGridOptions()`).
+- **Localization**: English (`en`), Polish (`pl`).
 
 ---
 
@@ -46,13 +41,30 @@ Zero dependencies, pure ES6 Web Component with Shadow DOM, native Home Assistant
    - **Resource type**: `JavaScript module`
 3. Reload your browser cache (`Ctrl+Shift+R` / `Cmd+Shift+R`).
 
+### Optional: `tuya-local` Device Configuration for Rakentaa Heat Pump
+
+If you integrate your Rakentaa heat pump (Chico CC1010B / `RA040-PW13-A3`) into Home Assistant using [`tuya-local`](https://github.com/make-all/tuya-local), this repository includes a ready-to-use device profile that exposes the heating curve parameters and live telemetry sensors:
+
+1. Download [`tuya_local/devices/rakentaa_cc1010b_waterheater.yaml`](tuya_local/devices/rakentaa_cc1010b_waterheater.yaml).
+2. Upload it to your Home Assistant `tuya_local` devices folder:
+   ```text
+   <config>/custom_components/tuya_local/devices/rakentaa_cc1010b_waterheater.yaml
+   ```
+3. Restart Home Assistant and add (or reload) the device in **Settings → Devices & Services → Tuya Local**.
+
 ---
 
 ## Usage
 
+### Configuration
+
+All entities, sensor labels, physical limits, and presets can be configured via the visual card editor or in YAML:
+
+![Rakentaa Heating Curve Card — Configuration](docs/images/configuration.png)
+
 ### Minimal Configuration (Full-Screen Panel View)
 
-If your Home Assistant exposes standard Rakentaa Modbus entity IDs, no extra configuration is required:
+If your Home Assistant exposes standard Rakentaa entity IDs, no extra configuration is required:
 
 ```yaml
 views:
@@ -64,8 +76,6 @@ views:
 ```
 
 ### Full Configuration Example
-
-All entities, sensor labels, physical limits, and presets can be configured either via the **Home Assistant Visual Card Editor** or in YAML:
 
 ```yaml
 type: custom:rakentaa-heating-curve-card
@@ -166,10 +176,8 @@ When `T_START < T_floor_return`, return water from the underfloor heating loop w
 
 ## Localization
 
-- **English (`en`)** — default language (uses `.` decimal separator).
-- **Polish (`pl`)** — full translation (uses `,` decimal separator and Polish plural rules).
-
-By default (`language: auto`), the card detects the language from `hass.language`. You can also pin `language: en` or `language: pl` in the card configuration.
+- English (`en`)
+- Polish (`pl`)
 
 ---
 
