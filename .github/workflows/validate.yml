@@ -1,0 +1,31 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  syntax:
+    name: JavaScript syntax & metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check ES module syntax
+        run: node --check rakentaa-heating-curve-card.js
+      - name: Validate hacs.json
+        run: node -e "const h = JSON.parse(require('fs').readFileSync('hacs.json', 'utf8')); if (!h.name || !h.filename) process.exit(1);"
+
+  hacs:
+    name: HACS validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
+        with:
+          category: plugin
+          ignore: brands,images
