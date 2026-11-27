@@ -461,44 +461,145 @@ const TRANSLATIONS = {
   }
 };
 
-const FORM_LABELS = {
-  language: 'Language',
-  layout: 'Layout mode',
-  comp_point_entity: 'Compensation point entity',
-  coeff_entity: 'Slope coefficient entity',
-  diff_entity: 'Return difference (hysteresis) entity',
-  water_comp_entity: 'Water temperature compensation entity',
-  auto_entity: 'Weather compensation mode entity',
-  fixed_target_entity: 'Fixed target water temperature entity',
-  ambient_entity: 'Heat pump outdoor sensor',
-  inlet_entity: 'Heating return (inlet) sensor',
-  outlet_entity: 'Heating supply (outlet) sensor',
-  buffer_entity: 'Buffer tank temperature sensor (optional)',
-  compressor_hz_entity: 'Compressor frequency sensor',
-  heating_co_entity: 'Space heating active binary sensor',
-  heating_dhw_entity: 'DHW heating active binary sensor',
-  outdoor_secondary_entity: 'Secondary outdoor sensor (optional)',
-  outdoor_secondary_name: 'Secondary outdoor sensor label',
-  outdoor_tertiary_entity: 'Tertiary outdoor sensor (optional)',
-  outdoor_tertiary_name: 'Tertiary outdoor sensor label',
-  panel_limit: 'Floor / buffer safety limit (°C)',
-  buffer_volume_l: 'Buffer tank volume (L)',
-  default_dt: 'Default exchanger ΔT (°C)',
-  default_floor_return: 'Default floor return temp (°C)',
-  floor_note: 'Floor specification note (tooltip)',
-  installer_comp_point: 'Preset compensation point (°C)',
-  installer_coeff: 'Preset slope coefficient',
-  installer_diff: 'Preset return difference (°C)',
-  installer_water_comp: 'Preset water compensation (°C)',
-  installer_dt: 'Preset exchanger ΔT (°C)'
+const FORM_I18N = {
+  en: {
+    sections: {
+      control: 'Heat pump control entities',
+      live: 'Live sensors',
+      limits: 'System limits & simulation defaults',
+      chart: 'Chart',
+      preset: 'Reference / installer preset'
+    },
+    options: {
+      langAuto: 'Auto (Home Assistant)',
+      layoutAuto: 'Auto',
+      layoutPanel: 'Full-screen panel',
+      layoutCard: 'Standard card'
+    },
+    nestedError: 'Nested entities/installer_preset objects require YAML editing.',
+    labels: {
+      language: 'Language',
+      layout: 'Layout mode',
+      comp_point_entity: 'Compensation point entity',
+      coeff_entity: 'Slope coefficient entity',
+      diff_entity: 'Return difference (hysteresis) entity',
+      water_comp_entity: 'Water temperature compensation entity',
+      auto_entity: 'Weather compensation mode entity',
+      fixed_target_entity: 'Fixed target water temperature entity',
+      ambient_entity: 'Heat pump outdoor sensor',
+      inlet_entity: 'Heating return (inlet) sensor',
+      outlet_entity: 'Heating supply (outlet) sensor',
+      buffer_entity: 'Buffer tank temperature sensor (optional)',
+      compressor_hz_entity: 'Compressor frequency sensor',
+      heating_co_entity: 'Space heating active binary sensor',
+      heating_dhw_entity: 'DHW heating active binary sensor',
+      outdoor_secondary_entity: 'Secondary outdoor sensor (optional)',
+      outdoor_secondary_name: 'Secondary outdoor sensor label',
+      outdoor_tertiary_entity: 'Tertiary outdoor sensor (optional)',
+      outdoor_tertiary_name: 'Tertiary outdoor sensor label',
+      panel_limit: 'Floor / buffer safety limit (°C)',
+      buffer_volume_l: 'Buffer tank volume (L)',
+      default_dt: 'Default exchanger ΔT (°C)',
+      default_floor_return: 'Default floor return temp (°C)',
+      dynamic_y_axis: 'Dynamic Y-axis scaling',
+      y_axis_min: 'Fixed Y-axis minimum (°C)',
+      y_axis_max: 'Fixed Y-axis maximum (°C)',
+      floor_note: 'Floor specification note (tooltip)',
+      installer_comp_point: 'Preset compensation point (°C)',
+      installer_coeff: 'Preset slope coefficient',
+      installer_diff: 'Preset return difference (°C)',
+      installer_water_comp: 'Preset water compensation (°C)',
+      installer_dt: 'Preset exchanger ΔT (°C)'
+    },
+    helpers: {
+      language: 'Auto follows your Home Assistant profile language (English default, Polish supported).',
+      layout: 'Auto fills the viewport in panel views and uses natural height in sections/preview.',
+      outdoor_secondary_entity: 'Optional reference outdoor sensor (e.g. HRV or garden sensor) used to calculate live sensor offset.',
+      buffer_volume_l: 'Used to estimate stored thermal energy per cycle (set to 0 to hide kWh estimate).',
+      dynamic_y_axis: 'Off (default): the Y-axis uses the fixed range below with 5 °C ticks. On: the range adapts to the plotted curves.',
+      y_axis_min: 'Used when dynamic scaling is off (default 10 °C).',
+      y_axis_max: 'Used when dynamic scaling is off (default 50 °C).'
+    }
+  },
+  pl: {
+    sections: {
+      control: 'Encje sterujące pompą ciepła',
+      live: 'Czujniki na żywo',
+      limits: 'Limity instalacji i domyślne wartości symulacji',
+      chart: 'Wykres',
+      preset: 'Nastawy referencyjne (instalatora)'
+    },
+    options: {
+      langAuto: 'Automatycznie (Home Assistant)',
+      layoutAuto: 'Automatyczny',
+      layoutPanel: 'Panel pełnoekranowy',
+      layoutCard: 'Zwykła karta'
+    },
+    nestedError: 'Zagnieżdżone obiekty entities/installer_preset wymagają edycji w YAML.',
+    labels: {
+      language: 'Język',
+      layout: 'Tryb układu',
+      comp_point_entity: 'Encja punktu kompensacji',
+      coeff_entity: 'Encja współczynnika (nachylenia)',
+      diff_entity: 'Encja różnicy powrotu (histerezy)',
+      water_comp_entity: 'Encja kompensacji temperatury wody',
+      auto_entity: 'Encja trybu pogodówki',
+      fixed_target_entity: 'Encja stałej temperatury zadanej wody',
+      ambient_entity: 'Czujnik zewnętrzny pompy ciepła',
+      inlet_entity: 'Czujnik powrotu CO (wlot)',
+      outlet_entity: 'Czujnik zasilania CO (wylot)',
+      buffer_entity: 'Czujnik temperatury bufora (opcjonalnie)',
+      compressor_hz_entity: 'Czujnik częstotliwości sprężarki',
+      heating_co_entity: 'Czujnik binarny grzania CO',
+      heating_dhw_entity: 'Czujnik binarny grzania CWU',
+      outdoor_secondary_entity: 'Drugi czujnik zewnętrzny (opcjonalnie)',
+      outdoor_secondary_name: 'Etykieta drugiego czujnika zewnętrznego',
+      outdoor_tertiary_entity: 'Trzeci czujnik zewnętrzny (opcjonalnie)',
+      outdoor_tertiary_name: 'Etykieta trzeciego czujnika zewnętrznego',
+      panel_limit: 'Limit bezpieczeństwa podłogi / bufora (°C)',
+      buffer_volume_l: 'Pojemność bufora (l)',
+      default_dt: 'Domyślna ΔT wymiennika (°C)',
+      default_floor_return: 'Domyślny powrót z podłogi (°C)',
+      dynamic_y_axis: 'Dynamiczne skalowanie osi Y',
+      y_axis_min: 'Stałe minimum osi Y (°C)',
+      y_axis_max: 'Stałe maksimum osi Y (°C)',
+      floor_note: 'Opis podłogi (w podpowiedzi)',
+      installer_comp_point: 'Punkt kompensacji – nastawa ref. (°C)',
+      installer_coeff: 'Współczynnik – nastawa ref.',
+      installer_diff: 'Różnica powrotu – nastawa ref. (°C)',
+      installer_water_comp: 'Kompensacja wody – nastawa ref. (°C)',
+      installer_dt: 'ΔT wymiennika – nastawa ref. (°C)'
+    },
+    helpers: {
+      language: 'Automatycznie: zgodnie z językiem profilu Home Assistant (domyślnie angielski, obsługiwany polski).',
+      layout: 'Automatyczny: w widoku panelu wypełnia ekran, w sekcjach i podglądzie ma naturalną wysokość.',
+      outdoor_secondary_entity: 'Opcjonalny czujnik referencyjny (np. rekuperator lub czujnik w ogrodzie) do wyliczania bieżącej korekty czujnika pompy.',
+      buffer_volume_l: 'Służy do szacowania energii zgromadzonej w cyklu (0 ukrywa szacunek kWh).',
+      dynamic_y_axis: 'Wyłączone (domyślnie): oś Y ma stały zakres poniżej, z podziałką co 5 °C. Włączone: zakres dopasowuje się do rysowanych krzywych.',
+      y_axis_min: 'Używane, gdy dynamiczne skalowanie jest wyłączone (domyślnie 10 °C).',
+      y_axis_max: 'Używane, gdy dynamiczne skalowanie jest wyłączone (domyślnie 50 °C).'
+    }
+  }
 };
 
-const FORM_HELPERS = {
-  language: 'Auto follows your Home Assistant profile language (English default, Polish supported).',
-  layout: 'Auto fills the viewport in panel views and uses natural height in sections/preview.',
-  outdoor_secondary_entity: 'Optional reference outdoor sensor (e.g. HRV or garden sensor) used to calculate live sensor offset.',
-  buffer_volume_l: 'Used to estimate stored thermal energy per cycle (set to 0 to hide kWh estimate).'
+const detectUiLang = () => {
+  const candidates = [];
+  try {
+    if (typeof document !== 'undefined') {
+      const ha = document.querySelector('home-assistant');
+      candidates.push(ha?.hass?.locale?.language, ha?.hass?.language, document.documentElement?.lang);
+    }
+  } catch (_) { /* ignore */ }
+  if (typeof navigator !== 'undefined') candidates.push(navigator.language);
+  for (const c of candidates) {
+    if (!c) continue;
+    const norm = String(c).toLowerCase().slice(0, 2);
+    if (FORM_I18N[norm]) return norm;
+  }
+  return 'en';
 };
+
+const formText = () => FORM_I18N[detectUiLang()] || FORM_I18N.en;
 
 class RakentaaHeatingCurveCard extends HTMLElement {
   static getStubConfig(_hass, entities = [], entitiesFallback = []) {
@@ -508,6 +609,7 @@ class RakentaaHeatingCurveCard extends HTMLElement {
   }
 
   static getConfigForm() {
+    const F = formText();
     return {
       schema: [
         {
@@ -521,7 +623,7 @@ class RakentaaHeatingCurveCard extends HTMLElement {
                 select: {
                   mode: 'dropdown',
                   options: [
-                    { value: 'auto', label: 'Auto (Home Assistant)' },
+                    { value: 'auto', label: F.options.langAuto },
                     { value: 'en', label: 'English' },
                     { value: 'pl', label: 'Polski' }
                   ]
@@ -535,9 +637,9 @@ class RakentaaHeatingCurveCard extends HTMLElement {
                 select: {
                   mode: 'dropdown',
                   options: [
-                    { value: 'auto', label: 'Auto' },
-                    { value: 'panel', label: 'Full-screen panel' },
-                    { value: 'card', label: 'Standard card' }
+                    { value: 'auto', label: F.options.layoutAuto },
+                    { value: 'panel', label: F.options.layoutPanel },
+                    { value: 'card', label: F.options.layoutCard }
                   ]
                 }
               }
@@ -548,7 +650,7 @@ class RakentaaHeatingCurveCard extends HTMLElement {
           type: 'expandable',
           name: '',
           flatten: true,
-          title: 'Heat pump control entities',
+          title: F.sections.control,
           schema: [
             { name: 'comp_point_entity', selector: { entity: { domain: 'number' } } },
             { name: 'coeff_entity', selector: { entity: { domain: 'number' } } },
@@ -562,7 +664,7 @@ class RakentaaHeatingCurveCard extends HTMLElement {
           type: 'expandable',
           name: '',
           flatten: true,
-          title: 'Live sensors',
+          title: F.sections.live,
           schema: [
             { name: 'ambient_entity', selector: { entity: { domain: 'sensor' } } },
             { name: 'inlet_entity', selector: { entity: { domain: 'sensor' } } },
@@ -581,7 +683,7 @@ class RakentaaHeatingCurveCard extends HTMLElement {
           type: 'expandable',
           name: '',
           flatten: true,
-          title: 'System limits & simulation defaults',
+          title: F.sections.limits,
           schema: [
             {
               type: 'grid',
@@ -600,7 +702,24 @@ class RakentaaHeatingCurveCard extends HTMLElement {
           type: 'expandable',
           name: '',
           flatten: true,
-          title: 'Reference / installer preset',
+          title: F.sections.chart,
+          schema: [
+            { name: 'dynamic_y_axis', default: false, selector: { boolean: {} } },
+            {
+              type: 'grid',
+              name: '',
+              schema: [
+                { name: 'y_axis_min', selector: { number: { min: 0, max: 80, step: 5, mode: 'box', unit_of_measurement: '°C' } } },
+                { name: 'y_axis_max', selector: { number: { min: 10, max: 90, step: 5, mode: 'box', unit_of_measurement: '°C' } } }
+              ]
+            }
+          ]
+        },
+        {
+          type: 'expandable',
+          name: '',
+          flatten: true,
+          title: F.sections.preset,
           schema: [
             {
               type: 'grid',
@@ -616,11 +735,11 @@ class RakentaaHeatingCurveCard extends HTMLElement {
           ]
         }
       ],
-      computeLabel: schema => FORM_LABELS[schema.name],
-      computeHelper: schema => FORM_HELPERS[schema.name],
+      computeLabel: schema => formText().labels[schema.name],
+      computeHelper: schema => formText().helpers[schema.name],
       assertConfig: config => {
         if (config && (config.entities || config.installer_preset)) {
-          throw new Error('Nested entities/installer_preset objects require YAML editing.');
+          throw new Error(formText().nestedError);
         }
       }
     };
@@ -673,6 +792,9 @@ class RakentaaHeatingCurveCard extends HTMLElement {
     this.LIMIT = 40;
     this.BUFFER_VOL = 100;
     this.FLOOR_NOTE = '';
+    this.DYN_Y = false;
+    this.Y_MIN = 10;
+    this.Y_MAX = 50;
     this.ORIG = { ...DEFAULT_ORIG };
     this.KEYS = ['auto', 'compPoint', 'coeff', 'diff', 'waterComp', 'fixedTarget'];
 
@@ -708,6 +830,7 @@ class RakentaaHeatingCurveCard extends HTMLElement {
     const candidates = [
       this._hass?.language,
       this._hass?.locale?.language,
+      typeof document !== 'undefined' ? document.documentElement?.lang : null,
       typeof navigator !== 'undefined' ? navigator.language : null
     ];
     for (const c of candidates) {
@@ -918,6 +1041,18 @@ class RakentaaHeatingCurveCard extends HTMLElement {
     this.LIMIT = this._validateNumber(cfg.panel_limit, 'panel_limit', 25, 65, 40);
     this.BUFFER_VOL = this._validateNumber(cfg.buffer_volume_l, 'buffer_volume_l', 0, 2000, 100);
     this.FLOOR_NOTE = typeof cfg.floor_note === 'string' ? cfg.floor_note.trim() : '';
+
+    if (cfg.dynamic_y_axis != null && typeof cfg.dynamic_y_axis !== 'boolean') {
+      throw new Error('"dynamic_y_axis" must be true or false');
+    }
+    const yMin = this._validateNumber(cfg.y_axis_min, 'y_axis_min', 0, 80, 10);
+    const yMax = this._validateNumber(cfg.y_axis_max, 'y_axis_max', 10, 90, 50);
+    if (yMax - yMin < 10) {
+      throw new Error('"y_axis_max" must be at least 10 °C higher than "y_axis_min"');
+    }
+    this.DYN_Y = cfg.dynamic_y_axis === true;
+    this.Y_MIN = yMin;
+    this.Y_MAX = yMax;
 
     const defaultDt = this._validateNumber(cfg.default_dt, 'default_dt', 3, 9, 4.5);
     const defaultFloor = this._validateNumber(cfg.default_floor_return, 'default_floor_return', 18, 25, 21);
@@ -1871,17 +2006,24 @@ dialog{width:min(470px,calc(100% - 32px));padding:24px 24px 20px;border:0;border
     const pw = W - P.l - P.r, ph = H - P.t - P.b;
     if (pw < 60 || ph < 60) return;
 
-    const cold = this._calc(S, -20), warm = this._calc(S, 20);
-    let hi = Math.max(cold.stop, sh.buffer ? cold.buffer : 0, sh.target ? cold.target : 0);
-    let lo = Math.min(warm.start, S.floorRet, this.LIVE.inlet ?? Infinity, this.LIVE.buffer ?? Infinity);
-    if (sh.orig) {
-      hi = Math.max(hi, this._calc(this.ORIG, -20).stop);
-      lo = Math.min(lo, this._calc(this.ORIG, 20).start);
+    let y0, y1, yStep;
+    if (this.DYN_Y) {
+      const cold = this._calc(S, -20), warm = this._calc(S, 20);
+      let hi = Math.max(cold.stop, sh.buffer ? cold.buffer : 0, sh.target ? cold.target : 0);
+      let lo = Math.min(warm.start, S.floorRet, this.LIVE.inlet ?? Infinity, this.LIVE.buffer ?? Infinity);
+      if (sh.orig) {
+        hi = Math.max(hi, this._calc(this.ORIG, -20).stop);
+        lo = Math.min(lo, this._calc(this.ORIG, 20).start);
+      }
+      y0 = Math.min(15, Math.max(0, Math.floor((lo - 2) / 5) * 5));
+      yStep = Math.max(this.LIMIT + S.floorRet - y0, hi) - y0 > 45 ? 10 : 5;
+      y0 = Math.floor(y0 / yStep) * yStep;
+      y1 = Math.min(90, Math.max(Math.round((this.LIMIT + S.floorRet - y0) / yStep) * yStep, Math.ceil((hi + 0.5) / yStep) * yStep));
+    } else {
+      y0 = this.Y_MIN;
+      y1 = this.Y_MAX;
+      yStep = 5;
     }
-    let y0 = Math.min(15, Math.max(0, Math.floor((lo - 2) / 5) * 5));
-    const yStep = Math.max(this.LIMIT + S.floorRet - y0, hi) - y0 > 45 ? 10 : 5;
-    y0 = Math.floor(y0 / yStep) * yStep;
-    const y1 = Math.min(90, Math.max(Math.round((this.LIMIT + S.floorRet - y0) / yStep) * yStep, Math.ceil((hi + 0.5) / yStep) * yStep));
 
     const X = t => P.l + ((20 - t) / 40) * pw;
     const Y = v => P.t + ((y1 - v) / (y1 - y0)) * ph;
@@ -1896,19 +2038,23 @@ dialog{width:min(470px,calc(100% - 32px));padding:24px 24px 20px;border:0;border
     const vline = (x, st) => `<line x1="${f(x)}" x2="${f(x)}" y1="${P.t}" y2="${f(B)}" ${st}/>`;
 
     const yL = Y(this.LIMIT);
+    const yLc = this._clamp(yL, P.t, B);
+    const limitInPlot = yL >= P.t - 0.5 && yL <= B + 0.5;
+    const yF = Y(S.floorRet);
+    const floorInPlot = yF >= P.t - 0.5 && yF <= B + 0.5;
     const cut = this._cutoff();
     const xCut = cut != null && cut < 20 ? X(Math.max(cut, -20)) : null;
 
     const o = [
       `<defs><clipPath id="clip"><rect x="${P.l}" y="${P.t}" width="${f(pw)}" height="${f(ph)}"/></clipPath><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="var(--nostart)"/><line y2="8" stroke="var(--c-floor)" stroke-opacity=".14" stroke-width="2"/></pattern></defs>`,
-      `<rect x="${P.l}" y="${P.t}" width="${f(pw)}" height="${f(Math.max(0, yL - P.t))}" fill="var(--limit)"/>`
+      `<rect x="${P.l}" y="${P.t}" width="${f(pw)}" height="${f(Math.max(0, yLc - P.t))}" fill="var(--limit)"/>`
     ];
     if (xCut != null) o.push(`<rect x="${P.l}" y="${P.t}" width="${f(Math.max(0, xCut - P.l))}" height="${f(ph)}" fill="url(#hatch)"/>`);
     for (let v = Math.ceil(y0 / yStep) * yStep; v <= y1 + 0.01; v += yStep) {
       o.push(`<line class="grid" x1="${P.l}" x2="${f(Rt)}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text x="${P.l - 8}" y="${f(Y(v))}" text-anchor="end" dominant-baseline="central">${v}°</text>`);
     }
+    if (limitInPlot) o.push(`<line x1="${P.l}" x2="${f(Rt)}" y1="${f(yL)}" y2="${f(yL)}" stroke="var(--c-stop)" stroke-opacity=".45" stroke-dasharray="4 4"/>`);
     o.push(
-      `<line x1="${P.l}" x2="${f(Rt)}" y1="${f(yL)}" y2="${f(yL)}" stroke="var(--c-stop)" stroke-opacity=".45" stroke-dasharray="4 4"/>`,
       `<line x1="${P.l}" x2="${f(Rt)}" y1="${f(B)}" y2="${f(B)}" stroke="var(--div)"/>`,
       vline(X(0), 'stroke="var(--fg2)" stroke-opacity=".35" stroke-dasharray="2 3"')
     );
@@ -1927,10 +2073,10 @@ dialog{width:min(470px,calc(100% - 32px));padding:24px 24px 20px;border:0;border
     for (const k of ['buffer', 'stop', 'target']) if (sh[k]) o.push(line(S, k, this.SER[k]));
     o.push(line(S, 'start', this.SER.start), '</g>');
 
-    if (xCut != null && xCut - P.l > 110 && B - yL > 60) {
-      o.push(`<text x="${P.l + 10}" y="${f(yL + 20)}" style="fill:var(--c-floor-t);font-weight:500">${this._esc(tr.chart.noStartTitle)}</text><text x="${P.l + 10}" y="${f(yL + 35)}" style="fill:var(--c-floor-t)">${this._esc(tr.chart.noStartSub)}</text>`);
+    if (xCut != null && xCut - P.l > 110 && B - yLc > 60) {
+      o.push(`<text x="${P.l + 10}" y="${f(yLc + 20)}" style="fill:var(--c-floor-t);font-weight:500">${this._esc(tr.chart.noStartTitle)}</text><text x="${P.l + 10}" y="${f(yLc + 35)}" style="fill:var(--c-floor-t)">${this._esc(tr.chart.noStartSub)}</text>`);
     }
-    if (sh.floor) o.push(`<text class="halo" x="${f(Rt - 8)}" y="${f(Y(S.floorRet) - 7)}" text-anchor="end" style="fill:var(--c-floor-t)">${this._esc(tr.chart.floorLabel(this._num(S.floorRet)))}</text>`);
+    if (sh.floor && floorInPlot) o.push(`<text class="halo" x="${f(Rt - 8)}" y="${f(Y(S.floorRet) - 7)}" text-anchor="end" style="fill:var(--c-floor-t)">${this._esc(tr.chart.floorLabel(this._num(S.floorRet)))}</text>`);
     if (xCut != null && cut > -20) {
       o.push(`<circle cx="${f(xCut)}" cy="${f(Y(S.floorRet))}" r="4" fill="var(--card)" stroke="var(--c-floor)" stroke-width="2"/><text class="halo" x="${f(xCut)}" y="${f(B - 8)}" text-anchor="middle" style="fill:var(--c-floor-t)">${this._sgn(cut)}°</text>`);
     }

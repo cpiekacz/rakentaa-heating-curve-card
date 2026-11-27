@@ -13,6 +13,7 @@ An interactive Home Assistant Lovelace custom card for monitoring, simulating, a
   - Plots **START**, **STOP**, **Target**, **Buffer max**, **Floor return threshold**, and optional **Installer reference preset** curves across `+20 °C` to `−20 °C`.
   - Click, drag, hover, or use keyboard arrows (`←` / `→`) on the chart to inspect any outdoor temperature.
   - Highlights the **no-start zone** (`START < floor return`) and **floor safety limit zone** (`Buffer max > panel_limit`).
+  - Fixed Y-axis range (default `10–50 °C`, 5 °C ticks) with optional dynamic scaling.
   - Switch between **Chart** and **Table** views at any time.
 - **What-If Simulation Sliders**: Experiment with outdoor temperature, pump sensor offset (`bias`), heat exchanger `ΔT`, and floor return temperature without modifying heat pump settings.
 - **Safe Heat Pump Parameter Tuning**:
@@ -112,6 +113,11 @@ default_dt: 4.5
 default_floor_return: 21
 floor_note: "8 mm laminate + underlay (R = 0.064)"
 
+# Chart
+dynamic_y_axis: false # false = fixed Y-axis range below (5 °C ticks)
+y_axis_min: 10
+y_axis_max: 50
+
 # Reference / installer preset
 installer_comp_point: 22
 installer_coeff: 6
@@ -148,6 +154,9 @@ installer_dt: 6
 | `default_dt` | `number` | `4.5` | Initial heat exchanger `ΔT` (`3–9 °C`). |
 | `default_floor_return` | `number` | `21` | Initial underfloor loop return temperature (`18–25 °C`). |
 | `floor_note` | `string` | `""` | Optional flooring specification note displayed in the buffer KPI tooltip. |
+| `dynamic_y_axis` | `boolean` | `false` | When `false`, the chart uses a fixed Y-axis range (`y_axis_min`–`y_axis_max`) with 5 °C ticks. When `true`, the Y-axis range adapts to the plotted curves. |
+| `y_axis_min` | `number` | `10` | Fixed Y-axis minimum (`0–80 °C`), used when `dynamic_y_axis` is `false`. |
+| `y_axis_max` | `number` | `50` | Fixed Y-axis maximum (`10–90 °C`, at least 10 °C above `y_axis_min`), used when `dynamic_y_axis` is `false`. |
 | `installer_comp_point` | `number` | `22` | Reference preset compensation point (`0–40 °C`). |
 | `installer_coeff` | `number` | `6` | Reference preset slope coefficient (`1–30`). |
 | `installer_diff` | `number` | `8` | Reference preset return difference (`2–18 °C`). |
