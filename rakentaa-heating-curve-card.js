@@ -1413,6 +1413,8 @@ table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:ta
   & .live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok)}
   & .rc{display:flex;align-items:center;gap:8px}}
 .step{flex:none;width:32px;height:28px;padding:0;border:0;border-radius:8px;display:grid;place-items:center;background:var(--step);cursor:pointer;touch-action:manipulation;&:hover{background:var(--step-h)}}
+.rc{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+@media (hover:none){.step:hover{background:var(--step)}}
 input[type=range]{--h:28px;--fill:var(--pri);--track:var(--ctrl-track);--a:0px;--b:0px;--ref:none;--thumb:linear-gradient(#fff,#fff) center/4px 12px no-repeat;
   appearance:none;flex:1;min-width:0;height:var(--h);margin:0;border-radius:8px;cursor:pointer;
   background:var(--ref),linear-gradient(90deg,#0000 var(--a),var(--fill) var(--a) var(--b),#0000 var(--b)),var(--track);
@@ -1584,26 +1586,92 @@ dialog{width:min(470px,calc(100% - 32px));padding:24px 24px 20px;border:0;border
     host.append(el);
     const inp = el.querySelector('input');
     const [bLo, bHi] = el.querySelectorAll('.step');
-    inp.addEventListener('input', () => {
-      this.S[d.key] = this._rnd(inp.valueAsNumber, 1);
+    const apply = v => {
+      if (!Number.isFinite(v)) return false;
+      const clamped = this._clamp(v, d.min, d.max);
+      const snapped = this._rnd(d.min + Math.round((clamped - d.min) / d.step) * d.step, 1);
+      if (snapped === this.S[d.key]) return false;
+      this.S[d.key] = snapped;
       if (d.key === 'tout') this.S.source = 'manual';
-      this._render();
+      return true;
+    };
+    inp.addEventListener('input', () => {
+      if (apply(inp.valueAsNumber)) this._renderUser();
     });
-    const nudge = up => { up ? inp.stepUp(d.k || 1) : inp.stepDown(d.k || 1); inp.dispatchEvent(new Event('input')); };
+    const nudge = up => {
+      if (inp.disabled) return;
+      const base = Number.isFinite(this.S[d.key]) ? this.S[d.key] : inp.valueAsNumber;
+      if (apply(base + (up ? 1 : -1) * d.step * (d.k || 1))) this._renderUser();
+    };
+
+    /* +/- buttons: mouse/pen act on press; touch acts on release (tap) so starting a page
+       scroll on a button never changes the value. Long press repeats on every device. */
     const hold = (btn, fn) => {
-      let t1, t2;
-      const stop = () => { clearTimeout(t1); clearInterval(t2); };
+      let t1 = null, t2 = null, fired = false, active = false;
+      const clear = () => { clearTimeout(t1); clearInterval(t2); t1 = t2 = null; };
       btn.addEventListener('pointerdown', e => {
         if (e.button) return;
-        e.preventDefault();
-        fn();
-        t1 = setTimeout(() => { t2 = setInterval(fn, 70); }, 420);
+        const touch = e.pointerType === 'touch';
+        if (!touch) e.preventDefault();
+        clear();
+        active = true;
+        fired = false;
+        if (!touch) { fn(); fired = true; }
+        t1 = setTimeout(() => { fired = true; fn(); t2 = setInterval(fn, touch ? 120 : 70); }, 450);
       });
-      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+      btn.addEventListener('pointerup', e => {
+        if (active && !fired && e.pointerType === 'touch') fn();
+        active = false;
+        clear();
+      });
+      ['pointerleave', 'pointercancel', 'lostpointercapture'].forEach(ev => btn.addEventListener(ev, () => { active = false; clear(); }));
+      btn.addEventListener('contextmenu', e => e.preventDefault());
       btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } });
     };
     hold(bLo, () => nudge(!!d.rtl));
     hold(bHi, () => nudge(!d.rtl));
+
+    /* Touch slider: no jump on tap, relative drag with reduced sensitivity for precise
+       tuning; a mostly vertical gesture scrolls the page instead of changing the value. */
+    const td = { id: null, x0: 0, y0: 0, lastY: 0, v0: 0, mode: null, raf: 0 };
+    const pxPerStep = () => {
+      const w = Math.max(60, inp.getBoundingClientRect().width - 24);
+      const steps = Math.max(1, (d.max - d.min) / d.step);
+      return this._clamp((w / steps) * 2.5, 3, 16);
+    };
+    inp.addEventListener('touchstart', e => {
+      if (inp.disabled || e.touches.length !== 1) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      td.id = t.identifier;
+      td.x0 = t.clientX;
+      td.y0 = td.lastY = t.clientY;
+      td.v0 = Number.isFinite(this.S[d.key]) ? this.S[d.key] : inp.valueAsNumber;
+      td.mode = null;
+      this._scrollCache = null;
+    }, { passive: false });
+    inp.addEventListener('touchmove', e => {
+      if (td.id == null) return;
+      const t = [...e.changedTouches].find(x => x.identifier === td.id);
+      if (!t) return;
+      e.preventDefault();
+      if (!td.mode) {
+        const dx = t.clientX - td.x0, dy = t.clientY - td.y0;
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        td.mode = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+        td.x0 = t.clientX;
+      }
+      if (td.mode === 'v') {
+        this._scrollBy(td.lastY - t.clientY);
+        td.lastY = t.clientY;
+        return;
+      }
+      const steps = Math.round((t.clientX - td.x0) / pxPerStep()) * (d.rtl ? -1 : 1);
+      if (apply(td.v0 + steps * d.step) && !td.raf) {
+        td.raf = requestAnimationFrame(() => { td.raf = 0; this._renderUser(); });
+      }
+    }, { passive: false });
+    ['touchend', 'touchcancel'].forEach(ev => inp.addEventListener(ev, () => { td.id = null; td.mode = null; }));
     this._R[d.key] = { d, inp, out: el.querySelector('output') };
   }
 
@@ -2181,6 +2249,49 @@ dialog{width:min(470px,calc(100% - 32px));padding:24px 24px 20px;border:0;border
     this._E.tfoot.textContent = S.auto
       ? tr.table.footAuto(this._num(S.coeff / 10), this._int(S.compPoint), S.diff)
       : tr.table.footFixed(S.fixedTarget, S.diff);
+  }
+
+  /* Scroll containers between the card and the document (incl. shadow roots), cached briefly. */
+  _scrollers() {
+    const now = Date.now();
+    if (this._scrollCache && now - this._scrollCache.t < 2000) return this._scrollCache.list;
+    const list = [];
+    if (this._E && this._E.frame) list.push(this._E.frame);
+    try {
+      let n = this.parentNode || this.getRootNode().host || null;
+      for (let i = 0; n && i < 60; i++) {
+        if (n.nodeType === 11) { n = n.host || null; continue; }
+        if (n.nodeType === 1) {
+          const oy = getComputedStyle(n).overflowY;
+          if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 1) list.push(n);
+        }
+        n = n.parentNode;
+      }
+    } catch (_) { /* ignore */ }
+    const se = typeof document !== 'undefined' ? document.scrollingElement : null;
+    if (se && !list.includes(se)) list.push(se);
+    this._scrollCache = { t: now, list };
+    return list;
+  }
+
+  _scrollBy(dy) {
+    if (!dy) return;
+    for (const el of this._scrollers()) {
+      const before = el.scrollTop;
+      el.scrollTop = before + dy;
+      if (el.scrollTop !== before) return;
+    }
+  }
+
+  /* Render after a user interaction while keeping every scroll position stable
+     (prevents the view from jumping on iOS when tapping +/- or dragging sliders). */
+  _renderUser() {
+    const sc = this._scrollers();
+    const pos = sc.map(el => el.scrollTop);
+    this._render();
+    const restore = () => sc.forEach((el, i) => { if (Math.abs(el.scrollTop - pos[i]) > 0.5) el.scrollTop = pos[i]; });
+    restore();
+    requestAnimationFrame(restore);
   }
 
   _render() {
